@@ -1,0 +1,4 @@
+Titanic/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
