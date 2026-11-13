@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# data input code
+'''
+data input code
+'''
 
 def read_labelled_data(filename):
     """Reads csv and returns tuple of float features and str labels (last column)."""
@@ -22,7 +24,10 @@ def np_read_labelled_data(filename:str)->tuple[np.ndarray, np.ndarray]:
     )
 
 
-# plot code
+''' 
+plot labeled data points 
+'''
+
 import matplotlib.pyplot as plt
 def plot_labelled_data(features, labels, y_units="bpm", x_units="seconds", y_label="song tempo", x_label="song length"):
     """Plot labelled data using different shapes and colours for each label."""
@@ -33,7 +38,7 @@ def plot_labelled_data(features, labels, y_units="bpm", x_units="seconds", y_lab
     # Use hard-coded size values for this example.
     plt.figure(figsize=(6, 4.5))
     
-    label_names = list(set(labels))
+    label_names = sorted(set(labels))
     for i in range(len(label_names)):
         points = [features[j] for j in range(len(features)) if labels[j] == label_names[i]]
         x = [p[0] for p in points]
@@ -46,9 +51,11 @@ def plot_labelled_data(features, labels, y_units="bpm", x_units="seconds", y_lab
     plt.grid(True)
     plt.show()
 
-
+"""
+Plot unlabelled data point
+"""
 def plot_data(data, y_units="bpm", x_units="seconds"):
-    """Plot unlabelled data."""
+
     # Note: You do not need to understand how the following matplotlib code works.
     # Use hard-coded size values for this example.
     plt.figure(figsize=(6, 4.5))
@@ -60,6 +67,65 @@ def plot_data(data, y_units="bpm", x_units="seconds"):
     plt.ylabel(f'song tempo ({y_units})')
     plt.grid(True)
     plt.show()
+'''
+plot training and test data points side by side
+'''
+def plot_train_test(train_features, test_features, 
+                    train_labels, test_labels, 
+                    labels):
+    shapes = ['o', 's', '^', 'D', 'x']
+    colours = ['red', 'blue', 'green', 'orange', 'purple']
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharex=True, sharey=True)
+
+    for i,label in enumerate(np.unique(labels)):
+        mask = train_labels == label
+        axes[0].scatter(train_features[mask, 0], train_features[mask, 1], label=label, 
+                        c=colours[i % len(colours)], 
+                        marker=shapes[i % len(shapes)])
+    axes[0].set_title("Training Data")
+    axes[0].set_xlabel("Song Length (seconds)")
+    axes[0].set_ylabel("Tempo (bpm)")
+    axes[0].legend()
+
+    for i,label in enumerate(np.unique(labels)):
+        mask = test_labels == label
+        axes[1].scatter(test_features[mask, 0], test_features[mask, 1], label=label,
+                        c=colours[i % len(colours)], 
+                        marker=shapes[i % len(shapes)])
+    axes[1].set_title("Test Data")
+    axes[1].set_xlabel("Song Length (seconds)")
+    axes[1].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_train_test_wrapper(
+    training_features, 
+    training_labels, 
+    test_features, 
+    test_labels,
+    labels
+):
+        
+    plot_train_test(
+        np.array(training_features), 
+        np.array(test_features),
+        np.array(training_labels),
+        np.array(test_labels),
+        np.array(labels)
+    )
+        
+def plot_folds(fold_indices, features, labels):
+    features = np.array(features)
+    labels = np.array(labels)
+    for f in range(len(fold_indices)):
+            test_indices = fold_indices[f]
+            # train_indices = [ i for i in range(len(features)) if i not in test_indices]
+            train_indices = np.arange(len(features))[ ~np.isin(np.arange(len(features)),test_indices )]
+            print(f"fold {f+1}")
+            plot_train_test( features[ train_indices], features[test_indices], 
+                     labels [ train_indices], labels[test_indices], labels)
+
 
 ## knn code (non-numpy) code
 
@@ -125,7 +191,9 @@ def predict_probabilities(k, training_features,
     return max ( knn_count, key=knn_count.get), probabilities
    
 
-
+'''
+print numpy array and meta-data
+'''
 def array_print(array:np.ndarray):
     print(f"{array}")
     print(f"{'dtype':<8}{'shape':<10}{'dim':<5}{'size':<10}")
